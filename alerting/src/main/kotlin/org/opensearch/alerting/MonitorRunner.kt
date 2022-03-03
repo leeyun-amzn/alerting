@@ -1,27 +1,6 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
- *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
-/*
- *   Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License").
- *   You may not use this file except in compliance with the License.
- *   A copy of the License is located at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   or in the "license" file accompanying this file. This file is distributed
- *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *   express or implied. See the License for the specific language governing
- *   permissions and limitations under the License.
  */
 
 package org.opensearch.alerting
@@ -31,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.apache.logging.log4j.LogManager
 import org.opensearch.action.bulk.BackoffPolicy
@@ -41,6 +19,7 @@ import org.opensearch.alerting.core.JobRunner
 import org.opensearch.alerting.core.model.ScheduledJob
 import org.opensearch.alerting.elasticapi.InjectorContextElement
 import org.opensearch.alerting.elasticapi.retry
+import org.opensearch.alerting.elasticapi.withClosableContext
 import org.opensearch.alerting.model.ActionRunResult
 import org.opensearch.alerting.model.Alert
 import org.opensearch.alerting.model.AlertingConfigAccessor
@@ -295,7 +274,7 @@ object MonitorRunner : JobRunner, CoroutineScope, AbstractLifecycleComponent() {
             return monitorResult.copy(error = e)
         }
         if (!isADMonitor(monitor)) {
-            runBlocking(InjectorContextElement(monitor.id, settings, threadPool.threadContext, roles)) {
+            withClosableContext(InjectorContextElement(monitor.id, settings, threadPool.threadContext, roles)) {
                 monitorResult = monitorResult.copy(inputResults = inputService.collectInputResults(monitor, periodStart, periodEnd))
             }
         } else {
@@ -384,7 +363,7 @@ object MonitorRunner : JobRunner, CoroutineScope, AbstractLifecycleComponent() {
             //  If a setting is imposed that limits buckets that can be processed for Bucket-Level Monitors, we'd need to iterate over
             //  the buckets until we hit that threshold. In that case, we'd want to exit the execution without creating any alerts since the
             //  buckets we iterate over before hitting the limit is not deterministic. Is there a better way to fail faster in this case?
-            runBlocking(InjectorContextElement(monitor.id, settings, threadPool.threadContext, roles)) {
+            withClosableContext(InjectorContextElement(monitor.id, settings, threadPool.threadContext, roles)) {
                 // Storing the first page of results in the case of pagination input results to prevent empty results
                 // in the final output of monitorResult which occurs when all pages have been exhausted.
                 // If it's favorable to return the last page, will need to check how to accomplish that with multiple aggregation paths

@@ -1,27 +1,6 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
- *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
-/*
- *   Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License").
- *   You may not use this file except in compliance with the License.
- *   A copy of the License is located at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   or in the "license" file accompanying this file. This file is distributed
- *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *   express or implied. See the License for the specific language governing
- *   permissions and limitations under the License.
  */
 
 package org.opensearch.alerting.model
@@ -132,6 +111,49 @@ class XContentTests : OpenSearchTestCase() {
         val monitorString = monitor.toJsonStringWithUser()
         val parsedMonitor = Monitor.parse(parser(monitorString))
         assertEquals("Round tripping QueryLevelMonitor doesn't work", monitor, parsedMonitor)
+    }
+
+    fun `test monitor parsing with no name`() {
+        val monitorStringWithoutName = """
+            {
+              "type": "monitor",
+              "enabled": false,
+              "schedule": {
+                "period": {
+                  "interval": 1,
+                  "unit": "MINUTES"
+                }
+              },
+              "inputs": [],
+              "triggers": []
+            }
+        """.trimIndent()
+
+        assertFailsWith<IllegalArgumentException>("Monitor name is null") { Monitor.parse(parser(monitorStringWithoutName)) }
+    }
+
+    fun `test monitor parsing with no schedule`() {
+        val monitorStringWithoutSchedule = """
+            {
+              "type": "monitor",
+              "name": "asdf",
+              "enabled": false,
+              "inputs": [],
+              "triggers": []
+            }
+        """.trimIndent()
+
+        assertFailsWith<IllegalArgumentException>("Monitor schedule is null") {
+            Monitor.parse(parser(monitorStringWithoutSchedule))
+        }
+    }
+
+    fun `test bucket-level monitor parsing`() {
+        val monitor = randomBucketLevelMonitor()
+
+        val monitorString = monitor.toJsonStringWithUser()
+        val parsedMonitor = Monitor.parse(parser(monitorString))
+        assertEquals("Round tripping BucketLevelMonitor doesn't work", monitor, parsedMonitor)
     }
 
     fun `test query-level trigger parsing`() {

@@ -1,27 +1,6 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
- *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
-/*
- *   Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License").
- *   You may not use this file except in compliance with the License.
- *   A copy of the License is located at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   or in the "license" file accompanying this file. This file is distributed
- *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *   express or implied. See the License for the specific language governing
- *   permissions and limitations under the License.
  */
 package org.opensearch.alerting.resthandler
 
@@ -271,7 +250,7 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         }
     }
 
-    /* Enable this test case after issue issue#269 is fixed.
+    /* Enable this test case after checking for disallowed destination during Monitor creation is added in
     fun `test creating a monitor with a disallowed destination type fails`() {
         try {
             // Create a Chime Destination
@@ -284,7 +263,8 @@ class MonitorRestApiIT : AlertingRestTestCase() {
                 chime = chime,
                 slack = null,
                 customWebhook = null,
-                email = null)
+                email = null
+            )
             val chimeDestination = createDestination(destination = destination)
 
             // Remove Chime from the allow_list
@@ -293,12 +273,13 @@ class MonitorRestApiIT : AlertingRestTestCase() {
                 .joinToString(prefix = "[", postfix = "]") { string -> "\"$string\"" }
             client().updateSettings(DestinationSettings.ALLOW_LIST.key, allowedDestinations)
 
-            createMonitor(randomMonitor(triggers = listOf(randomTrigger(destinationId = chimeDestination.id))))
+            createMonitor(randomQueryLevelMonitor(triggers = listOf(randomQueryLevelTrigger(destinationId = chimeDestination.id))))
             fail("Expected 403 Method FORBIDDEN response")
         } catch (e: ResponseException) {
             assertEquals("Unexpected status", RestStatus.FORBIDDEN, e.response.restStatus())
         }
-    }*/
+    }
+     */
 
     @Throws(Exception::class)
     fun `test updating search for a monitor`() {
@@ -584,10 +565,15 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         val expectedAcknowledgedCount = alertsToAcknowledge.size
 
         val acknowledgedAlerts = responseMap["success"] as List<String>
-        assertTrue("Expected $expectedAcknowledgedCount alerts to be acknowledged successfully.", acknowledgedAlerts.size == expectedAcknowledgedCount)
+        assertTrue(
+            "Expected $expectedAcknowledgedCount alerts to be acknowledged successfully.",
+            acknowledgedAlerts.size == expectedAcknowledgedCount
+        )
 
         val acknowledgedAlertsList = acknowledgedAlerts.toString()
-        alertsToAcknowledge.forEach { alert -> assertTrue("Alert with ID ${alert.id} not found in failed list.", acknowledgedAlertsList.contains(alert.id)) }
+        alertsToAcknowledge.forEach { alert ->
+            assertTrue("Alert with ID ${alert.id} not found in failed list.", acknowledgedAlertsList.contains(alert.id))
+        }
 
         val failedResponse = responseMap["failed"] as List<String>
         assertTrue("Expected 0 alerts to fail acknowledgment.", failedResponse.isEmpty())
@@ -602,7 +588,8 @@ class MonitorRestApiIT : AlertingRestTestCase() {
 
         val alertsGroup2 = (1..15).map { createAlert(randomAlert(monitor).copy(state = Alert.State.ACTIVE)) }.toTypedArray()
 
-        val alertsToAcknowledge = arrayOf(*alertsGroup1, *alertsGroup2) // Creating an array of alerts that includes alerts that have been already acknowledged, and new alerts.
+        // Creating an array of alerts that includes alerts that have been already acknowledged, and new alerts.
+        val alertsToAcknowledge = arrayOf(*alertsGroup1, *alertsGroup2)
 
         // WHEN
         val response = acknowledgeAlerts(monitor, *alertsToAcknowledge)
@@ -612,18 +599,29 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         val expectedAcknowledgedCount = alertsToAcknowledge.size - alertsGroup1.size
 
         val acknowledgedAlerts = responseMap["success"] as List<String>
-        assertTrue("Expected $expectedAcknowledgedCount alerts to be acknowledged successfully.", acknowledgedAlerts.size == expectedAcknowledgedCount)
+        assertTrue(
+            "Expected $expectedAcknowledgedCount alerts to be acknowledged successfully.",
+            acknowledgedAlerts.size == expectedAcknowledgedCount
+        )
 
         val acknowledgedAlertsList = acknowledgedAlerts.toString()
-        alertsGroup2.forEach { alert -> assertTrue("Alert with ID ${alert.id} not found in failed list.", acknowledgedAlertsList.contains(alert.id)) }
-        alertsGroup1.forEach { alert -> assertFalse("Alert with ID ${alert.id} found in failed list.", acknowledgedAlertsList.contains(alert.id)) }
+        alertsGroup2.forEach { alert ->
+            assertTrue("Alert with ID ${alert.id} not found in failed list.", acknowledgedAlertsList.contains(alert.id))
+        }
+        alertsGroup1.forEach { alert ->
+            assertFalse("Alert with ID ${alert.id} found in failed list.", acknowledgedAlertsList.contains(alert.id))
+        }
 
         val failedResponse = responseMap["failed"] as List<String>
         assertTrue("Expected ${alertsGroup1.size} alerts to fail acknowledgment.", failedResponse.size == alertsGroup1.size)
 
         val failedResponseList = failedResponse.toString()
-        alertsGroup1.forEach { alert -> assertTrue("Alert with ID ${alert.id} not found in failed list.", failedResponseList.contains(alert.id)) }
-        alertsGroup2.forEach { alert -> assertFalse("Alert with ID ${alert.id} found in failed list.", failedResponseList.contains(alert.id)) }
+        alertsGroup1.forEach { alert ->
+            assertTrue("Alert with ID ${alert.id} not found in failed list.", failedResponseList.contains(alert.id))
+        }
+        alertsGroup2.forEach { alert ->
+            assertFalse("Alert with ID ${alert.id} found in failed list.", failedResponseList.contains(alert.id))
+        }
     }
 
     @Throws(Exception::class)
@@ -883,27 +881,64 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         disableScheduledJob()
 
         val responseMap = getAlertingStats()
-        // assertEquals("Cluster name is incorrect", responseMap["cluster_name"], "alerting_integTestCluster")
-        assertEquals("Scheduled job is not enabled", false, responseMap[ScheduledJobSettings.SWEEPER_ENABLED.key])
+        assertAlertingStatsSweeperEnabled(responseMap, false)
         assertEquals("Scheduled job index exists but there are no scheduled jobs.", false, responseMap["scheduled_job_index_exists"])
         val _nodes = responseMap["_nodes"] as Map<String, Int>
-        assertEquals("Incorrect number of nodes", numberOfNodes, _nodes["total"])
-        assertEquals("Failed nodes found during monitor stats call", 0, _nodes["failed"])
-        assertEquals("More than $numberOfNodes successful node", numberOfNodes, _nodes["successful"])
+        validateAlertingStatsNodeResponse(_nodes)
+    }
+
+    fun `test monitor stats when disabling and re-enabling scheduled jobs with existing monitor`() {
+        // Enable Monitor jobs
+        enableScheduledJob()
+        val monitorId = createMonitor(randomQueryLevelMonitor(enabled = true), refresh = true).id
+
+        var alertingStats = getAlertingStats()
+        assertAlertingStatsSweeperEnabled(alertingStats, true)
+        assertEquals("Scheduled job index does not exist", true, alertingStats["scheduled_job_index_exists"])
+        assertEquals("Scheduled job index is not yellow", "yellow", alertingStats["scheduled_job_index_status"])
+        assertEquals("Nodes are not on schedule", numberOfNodes, alertingStats["nodes_on_schedule"])
+
+        val _nodes = alertingStats["_nodes"] as Map<String, Int>
+        validateAlertingStatsNodeResponse(_nodes)
+
+        assertTrue(
+            "Monitor [$monitorId] was not found scheduled based on the alerting stats response: $alertingStats",
+            isMonitorScheduled(monitorId, alertingStats)
+        )
+
+        // Disable Monitor jobs
+        disableScheduledJob()
+
+        alertingStats = getAlertingStats()
+        assertAlertingStatsSweeperEnabled(alertingStats, false)
+        assertFalse(
+            "Monitor [$monitorId] was still scheduled based on the alerting stats response: $alertingStats",
+            isMonitorScheduled(monitorId, alertingStats)
+        )
+
+        // Re-enable Monitor jobs
+        enableScheduledJob()
+
+        // Sleep briefly so sweep can reschedule the Monitor
+        Thread.sleep(2000)
+
+        alertingStats = getAlertingStats()
+        assertAlertingStatsSweeperEnabled(alertingStats, true)
+        assertTrue(
+            "Monitor [$monitorId] was not re-scheduled based on the alerting stats response: $alertingStats",
+            isMonitorScheduled(monitorId, alertingStats)
+        )
     }
 
     fun `test monitor stats no jobs`() {
-        // Disable the Monitor plugin.
+        // Enable the Monitor plugin.
         enableScheduledJob()
 
         val responseMap = getAlertingStats()
-        // assertEquals("Cluster name is incorrect", responseMap["cluster_name"], "alerting_integTestCluster")
-        assertEquals("Scheduled job is not enabled", true, responseMap[ScheduledJobSettings.SWEEPER_ENABLED.key])
+        assertAlertingStatsSweeperEnabled(responseMap, true)
         assertEquals("Scheduled job index exists but there are no scheduled jobs.", false, responseMap["scheduled_job_index_exists"])
         val _nodes = responseMap["_nodes"] as Map<String, Int>
-        assertEquals("Incorrect number of nodes", numberOfNodes, _nodes["total"])
-        assertEquals("Failed nodes found during monitor stats call", 0, _nodes["failed"])
-        assertEquals("More than $numberOfNodes successful node", numberOfNodes, _nodes["successful"])
+        validateAlertingStatsNodeResponse(_nodes)
     }
 
     fun `test monitor stats jobs`() {
@@ -912,16 +947,13 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         createRandomMonitor(refresh = true)
 
         val responseMap = getAlertingStats()
-        // assertEquals("Cluster name is incorrect", responseMap["cluster_name"], "alerting_integTestCluster")
-        assertEquals("Scheduled job is not enabled", true, responseMap[ScheduledJobSettings.SWEEPER_ENABLED.key])
+        assertAlertingStatsSweeperEnabled(responseMap, true)
         assertEquals("Scheduled job index does not exist", true, responseMap["scheduled_job_index_exists"])
         assertEquals("Scheduled job index is not yellow", "yellow", responseMap["scheduled_job_index_status"])
         assertEquals("Nodes are not on schedule", numberOfNodes, responseMap["nodes_on_schedule"])
 
         val _nodes = responseMap["_nodes"] as Map<String, Int>
-        assertEquals("Incorrect number of nodes", numberOfNodes, _nodes["total"])
-        assertEquals("Failed nodes found during monitor stats call", 0, _nodes["failed"])
-        assertEquals("More than $numberOfNodes successful node", numberOfNodes, _nodes["successful"])
+        validateAlertingStatsNodeResponse(_nodes)
     }
 
     @Throws(Exception::class)
@@ -943,16 +975,13 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         createRandomMonitor(refresh = true)
 
         val responseMap = getAlertingStats("/jobs_info")
-        // assertEquals("Cluster name is incorrect", responseMap["cluster_name"], "alerting_integTestCluster")
-        assertEquals("Scheduled job is not enabled", true, responseMap[ScheduledJobSettings.SWEEPER_ENABLED.key])
+        assertAlertingStatsSweeperEnabled(responseMap, true)
         assertEquals("Scheduled job index does not exist", true, responseMap["scheduled_job_index_exists"])
         assertEquals("Scheduled job index is not yellow", "yellow", responseMap["scheduled_job_index_status"])
         assertEquals("Nodes not on schedule", numberOfNodes, responseMap["nodes_on_schedule"])
 
         val _nodes = responseMap["_nodes"] as Map<String, Int>
-        assertEquals("Incorrect number of nodes", numberOfNodes, _nodes["total"])
-        assertEquals("Failed nodes found during monitor stats call", 0, _nodes["failed"])
-        assertEquals("More than $numberOfNodes successful node", numberOfNodes, _nodes["successful"])
+        validateAlertingStatsNodeResponse(_nodes)
     }
 
     fun `test monitor stats incorrect metric`() {
@@ -1044,5 +1073,37 @@ class MonitorRestApiIT : AlertingRestTestCase() {
         } catch (e: ResponseException) {
             assertEquals("Unexpected status", RestStatus.BAD_REQUEST, e.response.restStatus())
         }
+    }
+
+    private fun validateAlertingStatsNodeResponse(nodesResponse: Map<String, Int>) {
+        assertEquals("Incorrect number of nodes", numberOfNodes, nodesResponse["total"])
+        assertEquals("Failed nodes found during monitor stats call", 0, nodesResponse["failed"])
+        assertEquals("More than $numberOfNodes successful node", numberOfNodes, nodesResponse["successful"])
+    }
+
+    private fun isMonitorScheduled(monitorId: String, alertingStatsResponse: Map<String, Any>): Boolean {
+        val nodesInfo = alertingStatsResponse["nodes"] as Map<String, Any>
+        for (nodeId in nodesInfo.keys) {
+            val nodeInfo = nodesInfo[nodeId] as Map<String, Any>
+            val jobsInfo = nodeInfo["jobs_info"] as Map<String, Any>
+            if (jobsInfo.keys.contains(monitorId)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun assertAlertingStatsSweeperEnabled(alertingStatsResponse: Map<String, Any>, expected: Boolean) {
+        assertEquals(
+            "Legacy scheduled job enabled field is not set to $expected",
+            expected,
+            alertingStatsResponse[statsResponseOpendistroSweeperEnabledField]
+        )
+        assertEquals(
+            "Scheduled job is not ${if (expected) "enabled" else "disabled"}",
+            expected,
+            alertingStatsResponse[statsResponseOpenSearchSweeperEnabledField]
+        )
     }
 }

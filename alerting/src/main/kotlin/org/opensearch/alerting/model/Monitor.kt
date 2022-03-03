@@ -1,27 +1,6 @@
 /*
+ * Copyright OpenSearch Contributors
  * SPDX-License-Identifier: Apache-2.0
- *
- * The OpenSearch Contributors require contributions made to
- * this file be licensed under the Apache-2.0 license or a
- * compatible open source license.
- *
- * Modifications Copyright OpenSearch Contributors. See
- * GitHub history for details.
- */
-
-/*
- *   Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- *   Licensed under the Apache License, Version 2.0 (the "License").
- *   You may not use this file except in compliance with the License.
- *   A copy of the License is located at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *   or in the "license" file accompanying this file. This file is distributed
- *   on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- *   express or implied. See the License for the specific language governing
- *   permissions and limitations under the License.
  */
 
 package org.opensearch.alerting.model
@@ -237,11 +216,11 @@ data class Monitor(
         @JvmOverloads
         @Throws(IOException::class)
         fun parse(xcp: XContentParser, id: String = NO_ID, version: Long = NO_VERSION): Monitor {
-            lateinit var name: String
+            var name: String? = null
             // Default to QUERY_LEVEL_MONITOR to cover Monitors that existed before the addition of MonitorType
             var monitorType: String = MonitorType.QUERY_LEVEL_MONITOR.toString()
             var user: User? = null
-            lateinit var schedule: Schedule
+            var schedule: Schedule? = null
             var lastUpdateTime: Instant? = null
             var enabledTime: Instant? = null
             var uiMetadata: Map<String, Any> = mapOf()
