@@ -55,7 +55,7 @@ class InputService(
             monitor.inputs.forEach { input ->
                 when (input) {
                     // debug use
-
+                    logger.info("SearchInput: ${SearchInput}")
                     is SearchInput -> {
                         // TODO: Figure out a way to use SearchTemplateRequest without bringing in the entire TransportClient
                         val searchParams = mapOf(
