@@ -54,6 +54,8 @@ class InputService(
             //  need to be updated to account for it
             monitor.inputs.forEach { input ->
                 when (input) {
+                    // debug use
+
                     is SearchInput -> {
                         // TODO: Figure out a way to use SearchTemplateRequest without bringing in the entire TransportClient
                         val searchParams = mapOf(
