@@ -98,7 +98,7 @@ integTest.getClusters().forEach{c -> c.plugin(project.getObjects().fileProperty(
 
 def _numNodes = findProperty('numNodes') as Integer ?: 1
 testClusters.integTest {
-    testDistribution = "ARCHIVE"
+    testDistribution = "INTEG_TEST"
     // Cluster shrink exception thrown if we try to set numberOfNodes to 1, so only apply if > 1
     if (_numNodes > 1) numberOfNodes = _numNodes
     // When running integration tests it doesn't forward the --debug-jvm to the cluster anymore
@@ -160,7 +160,7 @@ String bwcFilePath = "src/test/resources/bwc"
 2.times {i ->
     testClusters {
         "${baseName}$i" {
-            testDistribution = "ARCHIVE"
+            testDistribution = "INTEG_TEST"
             versions = ["7.10.2","1.3.0-SNAPSHOT"]
             numberOfNodes = 3
             plugin(provider(new Callable<RegularFile>(){

@@ -14,18 +14,18 @@ import org.opensearch.search.fetch.subphase.FetchSourceContext
 import java.io.IOException
 
 class GetFindingsSearchRequest : ActionRequest {
-    val findingsId: String?
+    val findingId: String?
     val version: Long
     val srcContext: FetchSourceContext?
     val table: Table
 
     constructor(
-        findingsId: String?,
+        findingId: String?,
         version: Long,
         srcContext: FetchSourceContext?,
         table: Table
     ) : super() {
-        this.findingsId = findingsId
+        this.findingId = findingId
         this.version = version
         this.srcContext = srcContext
         this.table = table
@@ -33,7 +33,7 @@ class GetFindingsSearchRequest : ActionRequest {
 
     @Throws(IOException::class)
     constructor(sin: StreamInput) : this(
-        findingsId = sin.readOptionalString(),
+        findingId = sin.readOptionalString(),
         version = sin.readLong(),
         srcContext = if (sin.readBoolean()) {
             FetchSourceContext(sin)
@@ -47,7 +47,7 @@ class GetFindingsSearchRequest : ActionRequest {
 
     @Throws(IOException::class)
     override fun writeTo(out: StreamOutput) {
-        out.writeOptionalString(findingsId)
+        out.writeOptionalString(findingId)
         out.writeLong(version)
         out.writeBoolean(srcContext != null)
         srcContext?.writeTo(out)
