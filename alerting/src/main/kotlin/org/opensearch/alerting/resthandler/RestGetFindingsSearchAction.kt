@@ -5,6 +5,20 @@
 
 package org.opensearch.alerting.resthandler
 
+import org.apache.logging.log4j.LogManager
+import org.opensearch.alerting.action.GetFindingsSearchAction
+import org.opensearch.alerting.action.GetFindingsSearchRequest
+import org.opensearch.alerting.model.Table
+import org.opensearch.alerting.util.context
+import org.opensearch.client.node.NodeClient
+import org.opensearch.rest.BaseRestHandler
+import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
+import org.opensearch.rest.RestHandler.Route
+import org.opensearch.rest.RestRequest
+import org.opensearch.rest.action.RestActions
+import org.opensearch.rest.action.RestToXContentListener
+import org.opensearch.search.fetch.subphase.FetchSourceContext
+
 /**
  * This class consists of the REST handler to search findings .
  */
@@ -30,7 +44,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
             srcContext = FetchSourceContext.DO_NOT_FETCH_SOURCE
         }
 
-        val sortString = request.param("sortString", "destination.name.keyword")
+        val sortString = request.param("sortString", "finding.name.keyword")
         val sortOrder = request.param("sortOrder", "asc")
         val missing: String? = request.param("missing")
         val size = request.paramAsInt("size", 20)
@@ -54,7 +68,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
         )
         return RestChannelConsumer {
             channel ->
-            client.execute(RestGetFindingsSearchAction.INSTANCE, getFindingsSearchRequest, RestToXContentListener(channel))
+            client.execute(GetFindingsSearchAction.INSTANCE, getFindingsSearchRequest, RestToXContentListener(channel))
         }
     }
 }

@@ -21,9 +21,9 @@ class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     var findings: List<Finding>
 
     constructor(
-            status: RestStatus,
-            totalFindings: Int?,
-            findings: List<Destination>
+        status: RestStatus,
+        totalFindings: Int?,
+        findings: List<Destination>
     ) : super() {
         this.status = status
         this.totalFindings = totalFindings
@@ -55,8 +55,8 @@ class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     @Throws(IOException::class)
     override fun toXContent(builder: XContentBuilder, params: ToXContent.Params): XContentBuilder {
         builder.startObject()
-                .field("totalFindings", totalFindings)
-                .field("findings", findings)
+            .field("totalFindings", totalFindings)
+            .field("findings", findings)
 
         return builder.endObject()
     }
