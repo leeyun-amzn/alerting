@@ -23,8 +23,7 @@ class GetFindingsSearchRequest : ActionRequest {
         findingsId: String?,
         version: Long,
         srcContext: FetchSourceContext?,
-        table: Table,
-        destinationType: String
+        table: Table
     ) : super() {
         this.findingsId = findingsId
         this.version = version

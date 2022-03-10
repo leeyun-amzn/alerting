@@ -23,7 +23,7 @@ class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     constructor(
         status: RestStatus,
         totalFindings: Int?,
-        findings: List<Destination>
+        findings: List<Finding>
     ) : super() {
         this.status = status
         this.totalFindings = totalFindings
@@ -33,11 +33,11 @@ class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     @Throws(IOException::class)
     constructor(sin: StreamInput) {
         this.status = sin.readEnum(RestStatus::class.java)
-        val findings = mutableListOf<Destination>()
+        val findings = mutableListOf<Finding>()
         this.totalFindings = sin.readOptionalInt()
         var currentSize = sin.readInt()
         for (i in 0 until currentSize) {
-            findings.add(Destination.readFrom(sin))
+            findings.add(Finding.readFrom(sin))
         }
         this.findings = findings
     }
