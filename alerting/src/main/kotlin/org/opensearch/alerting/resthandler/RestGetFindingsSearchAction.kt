@@ -44,6 +44,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
             srcContext = FetchSourceContext.DO_NOT_FETCH_SOURCE
         }
 
+        val sortString = request.param("sortString", "finding.name.keyword")
         val sortOrder = request.param("sortOrder", "asc")
         val missing: String? = request.param("missing")
         val size = request.paramAsInt("size", 20)
@@ -52,6 +53,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
 
         val table = Table(
             sortOrder,
+            sortString,
             missing,
             size,
             startIndex,
