@@ -181,7 +181,7 @@ internal class AlertingPlugin : PainlessExtension, ActionPlugin, ScriptPlugin, R
             RestGetEmailGroupAction(),
             RestGetDestinationsAction(),
             RestGetAlertsAction(),
-            RestGetFindingsSearchAction(),
+            RestGetFindingsSearchAction()
         )
     }
 
