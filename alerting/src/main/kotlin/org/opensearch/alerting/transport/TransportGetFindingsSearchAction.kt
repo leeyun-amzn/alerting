@@ -134,7 +134,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
-            .indices(ScheduledJob.SCHEDULED_JOBS_INDEX)
+            .indices(".opensearch-alerting-findings")
         client.search(
             searchRequest,
             object : ActionListener<SearchResponse> {
