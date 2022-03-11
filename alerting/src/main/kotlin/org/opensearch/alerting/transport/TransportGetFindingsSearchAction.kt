@@ -67,6 +67,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         getFindingsSearchRequest: GetFindingsSearchRequest,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ) {
+        log.info("Entering RestGetFindingsSearchAction.kt.")
         val user = readUserFromThreadContext(client)
         val tableProp = getFindingsSearchRequest.table
 

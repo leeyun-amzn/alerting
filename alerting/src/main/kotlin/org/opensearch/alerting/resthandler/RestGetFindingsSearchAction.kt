@@ -35,6 +35,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
     }
 
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
+        log.info("Entering RestGetFindingsSearchAction.kt.")
         log.info("${request.method()} ${request.path()}")
 
         val findingID: String? = request.param("findingID")
