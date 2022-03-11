@@ -14,7 +14,6 @@ import org.opensearch.action.support.HandledTransportAction
 import org.opensearch.alerting.action.GetFindingsSearchAction
 import org.opensearch.alerting.action.GetFindingsSearchRequest
 import org.opensearch.alerting.action.GetFindingsSearchResponse
-import org.opensearch.alerting.core.model.ScheduledJob
 import org.opensearch.alerting.elasticapi.addFilter
 import org.opensearch.alerting.model.Finding
 import org.opensearch.alerting.settings.AlertingSettings
