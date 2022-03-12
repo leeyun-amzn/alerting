@@ -112,6 +112,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         actionListener: ActionListener<GetFindingsSearchResponse>,
         user: User?
     ) {
+        log.info("Entering RestGetFindingsSearchAction.kt.")
         if (user == null) {
             // user is null when: 1/ security is disabled. 2/when user is super-admin.
             search(searchSourceBuilder, actionListener)
@@ -131,6 +132,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     }
 
     fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
+        log.info("Entering RestGetFindingsSearchAction.kt.")
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")

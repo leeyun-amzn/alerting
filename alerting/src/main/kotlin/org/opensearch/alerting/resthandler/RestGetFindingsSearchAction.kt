@@ -6,6 +6,7 @@
 package org.opensearch.alerting.resthandler
 
 import org.apache.logging.log4j.LogManager
+import org.opensearch.alerting.AlertingPlugin
 import org.opensearch.alerting.action.GetFindingsSearchAction
 import org.opensearch.alerting.action.GetFindingsSearchRequest
 import org.opensearch.alerting.model.Table
@@ -13,8 +14,11 @@ import org.opensearch.alerting.util.context
 import org.opensearch.client.node.NodeClient
 import org.opensearch.rest.BaseRestHandler
 import org.opensearch.rest.BaseRestHandler.RestChannelConsumer
+import org.opensearch.rest.RestHandler
 import org.opensearch.rest.RestHandler.Route
 import org.opensearch.rest.RestRequest
+import org.opensearch.rest.RestRequest.Method.GET
+import org.opensearch.rest.RestRequest.Method.POST
 import org.opensearch.rest.action.RestActions
 import org.opensearch.rest.action.RestToXContentListener
 import org.opensearch.search.fetch.subphase.FetchSourceContext
@@ -31,7 +35,10 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
     }
 
     override fun routes(): List<Route> {
-        return listOf()
+        return listOf(
+            Route(POST, "${AlertingPlugin.FINDING_BASE_URI}/_search"),
+            Route(GET, "${AlertingPlugin.MONITOR_BASE_URI}/_search")
+        )
     }
 
     override fun prepareRequest(request: RestRequest, client: NodeClient): RestChannelConsumer {
