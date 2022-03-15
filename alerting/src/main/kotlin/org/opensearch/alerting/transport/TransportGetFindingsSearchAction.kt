@@ -13,7 +13,7 @@ import org.opensearch.action.support.ActionFilters
 import org.opensearch.action.support.HandledTransportAction
 import org.opensearch.alerting.action.GetFindingsSearchAction
 import org.opensearch.alerting.action.GetFindingsSearchRequest
-import org.opensearch.alerting.action.GetFindingsSearchResponse
+// import org.opensearch.alerting.action.GetFindingsSearchResponse
 import org.opensearch.alerting.elasticapi.addFilter
 // import org.opensearch.alerting.model.Finding
 import org.opensearch.alerting.settings.AlertingSettings
@@ -50,7 +50,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     actionFilters: ActionFilters,
     val settings: Settings,
     val xContentRegistry: NamedXContentRegistry
-) : HandledTransportAction<GetFindingsSearchRequest, GetFindingsSearchResponse> (
+) : HandledTransportAction<GetFindingsSearchRequest, SearchResponse> (
     GetFindingsSearchAction.NAME, transportService, actionFilters, ::GetFindingsSearchRequest
 ),
     SecureTransportAction {
@@ -64,7 +64,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     override fun doExecute(
         task: Task,
         getFindingsSearchRequest: GetFindingsSearchRequest,
-        actionListener: ActionListener<GetFindingsSearchResponse>
+        actionListener: ActionListener<SearchResponse>
     ) {
         log.info("Entering RestGetFindingsSearchAction.kt.")
         val user = readUserFromThreadContext(client)
@@ -131,7 +131,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
+    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<SearchResponse>) {
         log.info("Entering RestGetFindingsSearchAction.kt.")
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
