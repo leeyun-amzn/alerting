@@ -109,7 +109,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun resolve(
         searchSourceBuilder: SearchSourceBuilder,
-        actionListener: ActionListener<SearchResponse>,
+        actionListener: ActionListener<GetFindingsSearchResponse>,
         user: User?
     ) {
         log.info("Entering RestGetFindingsSearchAction.kt.")
