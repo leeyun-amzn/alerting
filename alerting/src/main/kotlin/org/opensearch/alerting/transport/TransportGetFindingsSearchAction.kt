@@ -140,7 +140,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
             searchRequest,
             object : ActionListener<SearchResponse> {
                 override fun onResponse(response: SearchResponse) {
-                    /* val totalFindingCount = response.hits.totalHits?.value?.toInt()
+                    val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
                     for (hit in response.hits) {
                         // Debug use
@@ -153,9 +153,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         findings.add(Finding.parse(xcp, id))
                     }
-                    */
-                    // actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
-                    actionListener.onResponse(response)
+                    actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                 }
 
                 override fun onFailure(t: Exception) {
