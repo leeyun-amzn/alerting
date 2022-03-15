@@ -136,6 +136,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")
+        // Debug request
+        log.info("Request: $searchRequest")
         client.search(
             searchRequest,
             object : ActionListener<SearchResponse> {
