@@ -143,6 +143,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
                     for (hit in response.hits) {
+                        // Debug use
+                        log.info("hit: $hit")
                         val id = hit.id
                         val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, hit.sourceAsString)
