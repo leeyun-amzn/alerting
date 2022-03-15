@@ -84,8 +84,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
             .fetchSource(FetchSourceContext(true, Strings.EMPTY_ARRAY, Strings.EMPTY_ARRAY))
             .seqNoAndPrimaryTerm(true)
             .version(true)
-        val queryBuilder = QueryBuilders.boolQuery()
-            .must(QueryBuilders.existsQuery("finding"))
+        val queryBuilder = QueryBuilders.boolQuery().must(searchSourceBuilder.query())
+        // TODO: Update query to support other parameters of search
 
         if (!getFindingsSearchRequest.findingId.isNullOrBlank())
             queryBuilder.filter(QueryBuilders.termQuery("_id", getFindingsSearchRequest.findingId))
@@ -96,8 +96,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     QueryBuilders
                         .queryStringQuery(tableProp.searchString)
                         .defaultOperator(Operator.AND)
-                        .field("finding.type")
-                        .field("finding.name")
                 )
         }
         searchSourceBuilder.query(queryBuilder)
