@@ -142,6 +142,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 override fun onResponse(response: SearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
+                    log.info("response: $response")
                     for (hit in response.hits) {
                         // Debug use
                         log.info("Parsing hits.")
