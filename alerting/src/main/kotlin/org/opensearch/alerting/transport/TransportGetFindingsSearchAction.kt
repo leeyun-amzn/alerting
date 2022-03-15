@@ -144,6 +144,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     val findings = mutableListOf<Finding>()
                     for (hit in response.hits) {
                         // Debug use
+                        log.info("Parsing hits.")
                         log.info("hit: $hit")
                         val id = hit.id
                         val xcp = XContentFactory.xContent(XContentType.JSON)
