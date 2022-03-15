@@ -51,7 +51,7 @@ class RestGetFindingsSearchAction : BaseRestHandler() {
             srcContext = FetchSourceContext.DO_NOT_FETCH_SOURCE
         }
 
-        val sortString = request.param("sortString", "id")
+        val sortString = request.param("sortString", "id.keyword")
         val sortOrder = request.param("sortOrder", "asc")
         val missing: String? = request.param("missing")
         val size = request.paramAsInt("size", 20)
