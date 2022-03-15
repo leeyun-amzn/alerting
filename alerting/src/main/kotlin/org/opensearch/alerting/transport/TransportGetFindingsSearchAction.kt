@@ -15,7 +15,7 @@ import org.opensearch.alerting.action.GetFindingsSearchAction
 import org.opensearch.alerting.action.GetFindingsSearchRequest
 import org.opensearch.alerting.action.GetFindingsSearchResponse
 import org.opensearch.alerting.elasticapi.addFilter
-import org.opensearch.alerting.model.Finding
+// import org.opensearch.alerting.model.Finding
 import org.opensearch.alerting.settings.AlertingSettings
 import org.opensearch.alerting.util.AlertingException
 import org.opensearch.client.Client
@@ -23,16 +23,16 @@ import org.opensearch.cluster.service.ClusterService
 import org.opensearch.common.Strings
 import org.opensearch.common.inject.Inject
 import org.opensearch.common.settings.Settings
-import org.opensearch.common.xcontent.LoggingDeprecationHandler
+// import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
-import org.opensearch.common.xcontent.XContentFactory
-import org.opensearch.common.xcontent.XContentParser
-import org.opensearch.common.xcontent.XContentParserUtils
-import org.opensearch.common.xcontent.XContentType
+// import org.opensearch.common.xcontent.XContentFactory
+// import org.opensearch.common.xcontent.XContentParser
+// import org.opensearch.common.xcontent.XContentParserUtils
+// import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.authuser.User
 import org.opensearch.index.query.Operator
 import org.opensearch.index.query.QueryBuilders
-import org.opensearch.rest.RestStatus
+// import org.opensearch.rest.RestStatus
 import org.opensearch.search.builder.SearchSourceBuilder
 import org.opensearch.search.fetch.subphase.FetchSourceContext
 import org.opensearch.search.sort.SortBuilders
