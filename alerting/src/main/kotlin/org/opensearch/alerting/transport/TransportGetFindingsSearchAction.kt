@@ -84,7 +84,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
             .fetchSource(FetchSourceContext(true, Strings.EMPTY_ARRAY, Strings.EMPTY_ARRAY))
             .seqNoAndPrimaryTerm(true)
             .version(true)
-        val queryBuilder = QueryBuilders.boolQuery().must(searchSourceBuilder.query())
+        val queryBuilder = QueryBuilders.matchAllQuery()
         // TODO: Update query to support other parameters of search
 
         if (!getFindingsSearchRequest.findingId.isNullOrBlank())
