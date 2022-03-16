@@ -31,6 +31,7 @@ import org.opensearch.common.xcontent.XContentParserUtils
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.commons.authuser.User
 import org.opensearch.index.query.Operator
+import org.opensearch.index.query.MatchAllQueryBuilder
 import org.opensearch.index.query.QueryBuilders
 import org.opensearch.rest.RestStatus
 import org.opensearch.search.builder.SearchSourceBuilder
@@ -84,7 +85,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
             .fetchSource(FetchSourceContext(true, Strings.EMPTY_ARRAY, Strings.EMPTY_ARRAY))
             .seqNoAndPrimaryTerm(true)
             .version(true)
-        val queryBuilder = QueryBuilders.matchAllQuery()
+        val queryBuilder = MatchAllQueryBuilders.matchAllQuery()
         // TODO: Update query to support other parameters of search
 
         if (!getFindingsSearchRequest.findingId.isNullOrBlank())
