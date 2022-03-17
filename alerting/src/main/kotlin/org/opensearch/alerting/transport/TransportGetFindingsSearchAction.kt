@@ -149,6 +149,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         log.info("Parsing hits.")
                         log.info("hit: $hit")
                         val id = hit.id
+                        log.info("hit.sourceAsString: $hit.sourceAsString")
                         val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, hit.sourceAsString)
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
