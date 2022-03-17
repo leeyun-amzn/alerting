@@ -5,6 +5,7 @@
 
 package org.opensearch.alerting.model
 
+import org.apache.logging.log4j.LogManager
 import org.opensearch.alerting.elasticapi.instant
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
@@ -15,6 +16,8 @@ import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils.ensureExpectedToken
 import java.io.IOException
 import java.time.Instant
+
+private val log = LogManager.getLogger(Finding::class.java)
 
 /**
  * A wrapper of the log event that enriches the event by also including information about the monitor it triggered.
@@ -32,6 +35,7 @@ class Finding(
     val triggerId: String?,
     val triggerName: String?
 ) : Writeable, ToXContent {
+
     @Throws(IOException::class)
     constructor(sin: StreamInput) : this(
         id = sin.readString(),
@@ -127,6 +131,8 @@ class Finding(
             while (xcp.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = xcp.currentName()
                 xcp.nextToken()
+                // TODO: Remove debug log
+                log.info("fieldName: $fieldName")
 
                 when (fieldName) {
                     RELATED_DOC_ID_FIELD -> relatedDocId = xcp.text()
