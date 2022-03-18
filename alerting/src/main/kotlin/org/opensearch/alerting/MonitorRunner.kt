@@ -828,14 +828,14 @@ object MonitorRunner : JobRunner, CoroutineScope, AbstractLifecycleComponent() {
             triggerName = trigger.name
         )
 
-        val findingStr = finding.toXContent(XContentFactory.jsonBuilder(), ToXContent.MapParams(mapOf("with_type" to "true")))
+        val findingStr = finding.toXContent(XContentBuilder.builder(XContentType.JSON.xContent()), ToXContent.EMPTY_PARAMS).string()
         // change this to debug.
         logger.info("Findings: $findingStr")
 
         // todo: below is all hardcoded, temp code and added only to test. replace this with proper Findings index lifecycle management.
         val indexRequest = IndexRequest(".opensearch-alerting-findings")
             .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE)
-            .source(findingStr, XContentType.JSON)
+            .source(finding.toXContent(XContentFactory.jsonBuilder(), ToXContent.MapParams(mapOf("with_type" to "true"))))
 
         client.index(indexRequest).actionGet()
         return finding.id
