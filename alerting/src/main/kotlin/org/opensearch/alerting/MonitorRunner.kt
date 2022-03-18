@@ -81,6 +81,7 @@ import org.opensearch.common.settings.Settings
 import org.opensearch.common.xcontent.NamedXContentRegistry
 import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
+import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentType
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.QueryBuilders
@@ -836,7 +837,7 @@ object MonitorRunner : JobRunner, CoroutineScope, AbstractLifecycleComponent() {
         // todo: below is all hardcoded, temp code and added only to test. replace this with proper Findings index lifecycle management.
         val indexRequest = IndexRequest(".opensearch-alerting-findings")
             .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE)
-            .source(findingStr, XContentType.JSON)
+            .source(finding.toXContent(XContentFactory.jsonBuilder(), ToXContent.MapParams(mapOf("with_type" to "true"))))
 
         client.index(indexRequest).actionGet()
         return finding.id
