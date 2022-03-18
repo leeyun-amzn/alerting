@@ -146,7 +146,8 @@ class TransportGetDestinationsAction @Inject constructor(
                     for (hit in response.hits) {
                         // TODO: Remove debug logs
                         log.info("hit: $hit")
-                        log.info("hit.sourceAsString: $hit.sourceAsString")
+                        val source = hit.sourceAsString
+                        log.info("hit.sourceAsString: $source")
                         val id = hit.id
                         val version = hit.version
                         val seqNo = hit.seqNo.toInt()
