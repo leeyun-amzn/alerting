@@ -147,7 +147,11 @@ class Finding(
                         }
                     }
                     SEVERITY_FIELD -> severity = xcp.text()
-                    TIMESTAMP_FIELD -> timestamp = requireNotNull(xcp.instant())
+                    // TODO: Check if the timestamp type is correct
+                    TIMESTAMP_FIELD -> {
+                        timestamp = requireNotNull(xcp.instant())
+                        log.info("timestamp value: $timestamp")
+                    }
                     TRIGGER_ID_FIELD -> triggerId = xcp.text()
                     TRIGGER_NAME_FIELD -> triggerName = xcp.text()
                 }
