@@ -157,6 +157,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         // TODO: Remove debug log
                         log.info("Adding new finding with id: $id")
+                        val finding = Finding.parse(xcp, id)
+                        // TODO: Search the document with doc_id
+                        val doc_id = finding.relatedDocId
+                        log.info("doc_id: $doc_id")
                         findings.add(Finding.parse(xcp, id))
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
