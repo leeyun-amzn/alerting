@@ -57,6 +57,8 @@ class TransportGetMonitorAction @Inject constructor(
         val getRequest = GetRequest(ScheduledJob.SCHEDULED_JOBS_INDEX, getMonitorRequest.monitorId)
             .version(getMonitorRequest.version)
             .fetchSourceContext(getMonitorRequest.srcContext)
+        // Debug use
+        log.info("getRequest: $getRequest")
 
         if (!validateUserBackendRoles(user, actionListener)) {
             return
@@ -68,10 +70,10 @@ class TransportGetMonitorAction @Inject constructor(
          * Once system-indices [https://github.com/opendistro-for-elasticsearch/security/issues/666] is done, we
          * might further improve this logic. Also change try to kotlin-use for auto-closable.
          */
-        client.threadPool().threadContext.stashContext().use {
-            client.get(
-                getRequest,
-                object : ActionListener<GetResponse> {
+                    client.threadPool().threadContext.stashContext().use {
+                    client.get(
+                        getRequest,
+                        object : ActionListener<GetResponse> {
                     override fun onResponse(response: GetResponse) {
                         if (!response.isExists) {
                             actionListener.onFailure(
