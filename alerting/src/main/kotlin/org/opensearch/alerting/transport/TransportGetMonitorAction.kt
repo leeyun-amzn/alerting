@@ -70,10 +70,10 @@ class TransportGetMonitorAction @Inject constructor(
          * Once system-indices [https://github.com/opendistro-for-elasticsearch/security/issues/666] is done, we
          * might further improve this logic. Also change try to kotlin-use for auto-closable.
          */
-                    client.threadPool().threadContext.stashContext().use {
-                    client.get(
-                        getRequest,
-                        object : ActionListener<GetResponse> {
+        client.threadPool().threadContext.stashContext().use {
+            client.get(
+                getRequest,
+                object : ActionListener<GetResponse> {
                     override fun onResponse(response: GetResponse) {
                         if (!response.isExists) {
                             actionListener.onFailure(
