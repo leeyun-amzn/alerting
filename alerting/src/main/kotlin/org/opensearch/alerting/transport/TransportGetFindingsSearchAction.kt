@@ -135,8 +135,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")
-        // Debug request
-        log.info("Request: $searchRequest")
         client.search(
             searchRequest,
             object : ActionListener<SearchResponse> {
@@ -156,12 +154,16 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         log.info("created parser")
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         // TODO: Remove debug log
-                        log.info("Adding new finding with id: $id")
+                        log.info("Parsing new finding with id: $id")
                         val finding = Finding.parse(xcp, id)
                         // TODO: Search the document with doc_id
-                        val doc_id = finding.relatedDocId
-                        log.info("doc_id: $doc_id")
-                        findings.add(Finding.parse(xcp, id))
+                        val doc_ids = finding.relatedDocId
+                        val sourceIndex = finding.index
+                        log.info("doc_ids: $doc_ids")
+                        findings.add(finding)
+                        for (doc_id in doc_ids) {
+                            // Search document in index
+                        }
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                 }
@@ -171,5 +173,47 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 }
             }
         )
+    }
+
+    fun searchDocument(
+        documentId: String,
+        sourceIndex: String,
+        searchSourceBuilder: SearchSourceBuilder,
+        actionListener: ActionListener<GetFindingsSearchResponse>
+    ) {
+        log.info("Entering searchDocument.kt.")
+        val getRequest = GetRequest(sourceIndex, documentId)
+        // Debug request
+        log.info("Request: $getRequest")
+        client.threadPool().threadContext.stashContext().use {
+            client.get(
+                getRequest,
+                object : ActionListener<GetResponse> {
+                    override fun onResponse(response: GetResponse) {
+                        if (!response.isExists) {
+                            actionListener.onFailure(
+                                AlertingException.wrap(
+                                    OpenSearchStatusException(
+                                        "Document $documentId not found from source index $sourceIndex.",
+                                        RestStatus.NOT_FOUND
+                                    )
+                                )
+                            )
+                            return
+                        }
+                        log.info("response: $response")
+                        var monitor: Monitor? = null
+                        if (!response.isSourceEmpty) {
+                            log.info("response not empty")
+                        }
+                        // actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
+                    }
+
+                    override fun onFailure(t: Exception) {
+                        actionListener.onFailure(AlertingException.wrap(t))
+                    }
+                }
+            )
+        }
     }
 }

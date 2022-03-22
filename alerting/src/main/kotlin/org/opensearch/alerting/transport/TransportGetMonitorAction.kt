@@ -58,6 +58,8 @@ class TransportGetMonitorAction @Inject constructor(
             .version(getMonitorRequest.version)
             .fetchSourceContext(getMonitorRequest.srcContext)
         // Debug use
+        log.info("srcContext: $getMonitorRequest.srcContext")
+        log.info("version: $getMonitorRequest.version")
         log.info("getRequest: $getRequest")
 
         if (!validateUserBackendRoles(user, actionListener)) {
