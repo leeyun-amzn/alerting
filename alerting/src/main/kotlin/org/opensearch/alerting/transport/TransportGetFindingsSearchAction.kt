@@ -6,7 +6,10 @@
 package org.opensearch.alerting.transport
 
 import org.apache.logging.log4j.LogManager
+import org.opensearch.OpenSearchStatusException
 import org.opensearch.action.ActionListener
+import org.opensearch.action.get.GetRequest
+import org.opensearch.action.get.GetResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.support.ActionFilters
@@ -202,7 +205,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             return
                         }
                         log.info("response: $response")
-                        var monitor: Monitor? = null
                         if (!response.isSourceEmpty) {
                             log.info("response not empty")
                         }
