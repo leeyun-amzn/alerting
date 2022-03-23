@@ -166,6 +166,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         findings.add(finding)
                         for (doc_id in doc_ids) {
                             // Search document in index
+                            searchDocument(doc_id, sourceIndex, actionListener)
                         }
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
@@ -181,7 +182,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun searchDocument(
         documentId: String,
         sourceIndex: String,
-        searchSourceBuilder: SearchSourceBuilder,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ) {
         log.info("Entering searchDocument.kt.")
