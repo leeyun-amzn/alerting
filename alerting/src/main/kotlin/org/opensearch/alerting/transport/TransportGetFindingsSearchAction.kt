@@ -164,7 +164,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val sourceIndex = finding.index
                         findings.add(finding)
                         for (doc_id in doc_ids) {
-                        log.info("doc_id: $doc_id")
+                            log.info("doc_id: $doc_id")
                             // Search document in index
                             searchDocument(doc_id, sourceIndex, actionListener)
                         }
