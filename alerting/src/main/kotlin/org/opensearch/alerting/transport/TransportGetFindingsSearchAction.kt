@@ -160,11 +160,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         log.info("Parsing new finding with id: $id")
                         val finding = Finding.parse(xcp, id)
                         // TODO: Search the document with doc_id
-                        val doc_ids = finding.relatedDocId
+                        val doc_ids = finding.relatedDocId.split(",").toTypedArray()
                         val sourceIndex = finding.index
-                        log.info("doc_ids: $doc_ids")
                         findings.add(finding)
                         for (doc_id in doc_ids) {
+                        log.info("doc_id: $doc_id)
                             // Search document in index
                             searchDocument(doc_id, sourceIndex, actionListener)
                         }
