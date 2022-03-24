@@ -209,7 +209,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         if (!response.isSourceEmpty) {
                             log.info("response not empty")
                             val xcp = XContentFactory.xContent(XContentType.JSON)
-                                .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response)
+                                .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             log.info("created document parser")
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             val parsed = FindingDocument.parse(xcp, documentId)
