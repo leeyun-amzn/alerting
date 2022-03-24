@@ -19,6 +19,7 @@ import org.opensearch.alerting.action.GetFindingsSearchRequest
 import org.opensearch.alerting.action.GetFindingsSearchResponse
 import org.opensearch.alerting.elasticapi.addFilter
 import org.opensearch.alerting.model.Finding
+import org.opensearch.alerting.model.FindingDocument
 import org.opensearch.alerting.settings.AlertingSettings
 import org.opensearch.alerting.util.AlertingException
 import org.opensearch.client.Client
@@ -207,7 +208,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         log.info("response: $response")
                         if (!response.isSourceEmpty) {
                             log.info("response not empty")
-                            val parsed = FindingDocument.parse(xcp, response.getSourceAsString)
+                            val xcp = XContentFactory.xContent(XContentType.JSON)
+                                .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.getSourceAsString())
+                            log.info("created document parser")
+                            XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
+                            val parsed = FindingDocument.parse(xcp, documentId)
                             log.info("Parsed doc: $parsed")
                         }
                         // actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
