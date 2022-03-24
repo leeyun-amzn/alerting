@@ -207,6 +207,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         log.info("response: $response")
                         if (!response.isSourceEmpty) {
                             log.info("response not empty")
+                            val parsed = FindingDocument.parse(xcp, response.getSourceAsString)
+                            log.info("Parsed doc: $parsed")
                         }
                         // actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                     }
