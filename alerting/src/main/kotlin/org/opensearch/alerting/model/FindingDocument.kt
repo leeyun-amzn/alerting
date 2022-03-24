@@ -15,9 +15,6 @@ private val log = LogManager.getLogger(FindingDocument::class.java)
 class FindingDocument(
     val index: String,
     val id: String,
-    val version: Int?,
-    val seqNo: Int?,
-    val primaryTerm: Int?,
     val found: Boolean,
     val document: Map<String, Any>
 ) : Writeable, ToXContent {
@@ -26,9 +23,6 @@ class FindingDocument(
     constructor(sin: StreamInput) : this(
         index = sin.readString(),
         id = sin.readString(),
-        version = sin.readInt(),
-        seqNo = sin.readInt(),
-        primaryTerm = sin.readInt(),
         found = sin.readBoolean(),
         document = sin.readMap()
     )
@@ -37,14 +31,7 @@ class FindingDocument(
         builder.startObject()
             .field(INDEX_FIELD, index)
             .field(FINDING_DOCUMENT_ID_FIELD, id)
-
-        if (found) {
-            builder.field(VERSION_FIELD, version)
-                .field(SEQ_NO_FIELD, seqNo)
-                .field(PRIMARY_TERM_FIELD, primaryTerm)
-        }
-
-        builder.field(FOUND_FIELD, found)
+            .field(FOUND_FIELD, found)
 
         if (document.isEmpty()) builder.field(DOCUMENT_FIELD, document)
         builder.endObject()
@@ -55,9 +42,6 @@ class FindingDocument(
     override fun writeTo(out: StreamOutput) {
         out.writeString(index)
         out.writeString(id)
-        out.writeOptionalInt(version)
-        out.writeOptionalInt(seqNo)
-        out.writeOptionalInt(primaryTerm)
         out.writeBoolean(found)
         out.writeMap(document)
     }
@@ -65,21 +49,14 @@ class FindingDocument(
     companion object {
         const val INDEX_FIELD = "index"
         const val FINDING_DOCUMENT_ID_FIELD = "id"
-        const val VERSION_FIELD = "version"
-        const val SEQ_NO_FIELD = "seq_no"
-        const val PRIMARY_TERM_FIELD = "primary_term"
         const val FOUND_FIELD = "found"
         const val DOCUMENT_FIELD = "document"
         const val NO_ID = ""
+        const val NO_INDEX = ""
 
         @JvmStatic @JvmOverloads
         @Throws(IOException::class)
-        fun parse(xcp: XContentParser, id: String = NO_ID): FindingDocument {
-            lateinit var index: String
-            lateinit var id: String
-            var version: Int? = null
-            var seqNo: Int? = null
-            var primaryTerm: Int? = null
+        fun parse(xcp: XContentParser, id: String = NO_ID, index: String = NO_INDEX): FindingDocument {
             var found = false
             var document: Map<String, Any> = mapOf()
 
@@ -91,11 +68,6 @@ class FindingDocument(
                 log.info("fieldName: $fieldName")
 
                 when (fieldName) {
-                    INDEX_FIELD -> index = xcp.text()
-                    FINDING_DOCUMENT_ID_FIELD -> id = xcp.text()
-                    VERSION_FIELD -> version = xcp.intValue()
-                    SEQ_NO_FIELD -> seqNo = xcp.intValue()
-                    PRIMARY_TERM_FIELD -> primaryTerm = xcp.intValue()
                     FOUND_FIELD -> found = xcp.booleanValue()
                     DOCUMENT_FIELD -> document = xcp.map()
                 }
@@ -104,9 +76,6 @@ class FindingDocument(
             return FindingDocument(
                 index = index,
                 id = id,
-                version = version,
-                seqNo = seqNo,
-                primaryTerm = primaryTerm,
                 found = found,
                 document = document
             )
