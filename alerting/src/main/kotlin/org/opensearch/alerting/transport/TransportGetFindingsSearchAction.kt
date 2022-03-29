@@ -135,7 +135,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
+    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<SearchResponse>) {
         log.info("Entering RestGetFindingsSearchAction.kt.")
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
@@ -182,10 +182,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun searchDocument(
         documentId: String,
-        sourceIndex: String,
-        actionListener: ActionListener<FindingDocument>
-    ) {
+        sourceIndex: String
+    ): FindingDocument {
         val getRequest = GetRequest(sourceIndex, documentId)
+        var findingDocument: FindingDocument? = null
         client.threadPool().threadContext.stashContext().use {
             client.get(
                 getRequest,
@@ -202,7 +202,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             )
                             return
                         }
-                        var findingDocument: FindingDocument? = null
+
                         if (!response.isSourceEmpty) {
                             val xcp = XContentFactory.xContent(XContentType.JSON)
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
@@ -211,12 +211,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         }
                         actionListener.onResponse(findingDocument)
                     }
-
-                    override fun onFailure(t: Exception) {
-                        actionListener.onFailure(AlertingException.wrap(t))
-                    }
                 }
             )
+            return findingDocument
         }
     }
 }

@@ -57,10 +57,6 @@ class TransportGetMonitorAction @Inject constructor(
         val getRequest = GetRequest(ScheduledJob.SCHEDULED_JOBS_INDEX, getMonitorRequest.monitorId)
             .version(getMonitorRequest.version)
             .fetchSourceContext(getMonitorRequest.srcContext)
-        // Debug use
-        log.info("srcContext: $getMonitorRequest.srcContext")
-        log.info("version: $getMonitorRequest.version")
-        log.info("getRequest: $getRequest")
 
         if (!validateUserBackendRoles(user, actionListener)) {
             return
