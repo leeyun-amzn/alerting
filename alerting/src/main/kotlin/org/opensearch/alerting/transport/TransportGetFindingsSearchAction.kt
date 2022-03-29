@@ -70,7 +70,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
         getFindingsSearchRequest: GetFindingsSearchRequest,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ) {
-        log.info("Entering RestGetFindingsSearchAction.kt.")
         val user = readUserFromThreadContext(client)
         val tableProp = getFindingsSearchRequest.table
 
@@ -88,22 +87,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
             .fetchSource(FetchSourceContext(true, Strings.EMPTY_ARRAY, Strings.EMPTY_ARRAY))
             .seqNoAndPrimaryTerm(true)
             .version(true)
-        // val queryBuilder = QueryBuilders.boolQuery().must(searchSourceBuilder.query())
         val matchAllQueryBuilder = QueryBuilders.matchAllQuery()
         // TODO: Update query to support other parameters of search
 
-        /*if (!getFindingsSearchRequest.findingId.isNullOrBlank())
-            queryBuilder.filter(QueryBuilders.termQuery("_id", getFindingsSearchRequest.findingId))
-
-        if (!tableProp.searchString.isNullOrBlank()) {
-            queryBuilder
-                .must(
-                    QueryBuilders
-                        .queryStringQuery(tableProp.searchString)
-                        .defaultOperator(Operator.AND)
-                )
-        }
-        */
         searchSourceBuilder.query(matchAllQueryBuilder)
 
         client.threadPool().threadContext.stashContext().use {
@@ -113,10 +99,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun resolve(
         searchSourceBuilder: SearchSourceBuilder,
-        actionListener: ActionListener<GetFindingsSearchResponse>,
+        actionListener: ActionListener<SearchResponse>,
         user: User?
     ) {
-        log.info("Entering RestGetFindingsSearchAction.kt.")
         if (user == null) {
             // user is null when: 1/ security is disabled. 2/when user is super-admin.
             search(searchSourceBuilder, actionListener)
@@ -135,14 +120,14 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<SearchResponse>) {
+    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")
         client.search(
             searchRequest,
             object : ActionListener<SearchResponse> {
-                override fun onResponse(response: GetFindingsSearchResponse) {
+                override fun onResponse(response: SearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
                     val findingsWithDocs = mutableListOf<FindingWithDocs>()
