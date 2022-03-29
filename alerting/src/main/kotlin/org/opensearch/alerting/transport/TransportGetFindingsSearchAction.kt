@@ -131,14 +131,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
                     val findingsWithDocs = mutableListOf<FindingWithDocs>()
-                    log.info("response: $response")
                     for (hit in response.hits) {
                         val id = hit.id
                         val source = hit.sourceAsString
-                        log.info("hit.sourceAsString: $source")
                         val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, hit.sourceAsString)
-                        log.info("created parser")
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         val finding = Finding.parse(xcp, id)
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
@@ -150,9 +147,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             if (document != null)
                                 docs.add(document)
                         }
-                        findingsWithDocs.add(FindingWithDocs(finding, docs))
+                        val findingWithDoc = FindingWithDocs(finding, docs)
+                        findingsWithDocs.add(findingWithDoc)
                         // TODO: remove debug log
-                        log.info("findingsWithDocs: $findingsWithDocs")
+                        log.info("findingWithDoc: $findingWithDoc")
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                 }
