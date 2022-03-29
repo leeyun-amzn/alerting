@@ -135,14 +135,13 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
-        log.info("Entering RestGetFindingsSearchAction.kt.")
+    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<SearchResponse>) {
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")
         client.search(
             searchRequest,
-            object : ActionListener<GetFindingsSearchResponse> {
+            object : ActionListener<SearchResponse> {
                 override fun onResponse(response: GetFindingsSearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
