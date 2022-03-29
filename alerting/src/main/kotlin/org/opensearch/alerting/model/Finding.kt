@@ -126,14 +126,11 @@ class Finding(
             lateinit var timestamp: Instant
             lateinit var triggerId: String
             lateinit var triggerName: String
-            val relatedDocuments: MutableList<FindingDocument> = mutableListOf()
 
             ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.currentToken(), xcp)
             while (xcp.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = xcp.currentName()
                 xcp.nextToken()
-                // TODO: Remove debug log
-                log.info("fieldName: $fieldName")
 
                 when (fieldName) {
                     RELATED_DOC_ID_FIELD -> relatedDocId = xcp.text()
@@ -148,19 +145,11 @@ class Finding(
                         }
                     }
                     SEVERITY_FIELD -> severity = xcp.text()
-                    // TODO: Check if the timestamp type is correct
                     TIMESTAMP_FIELD -> {
                         timestamp = requireNotNull(xcp.instant())
-                        log.info("timestamp value: $timestamp")
                     }
                     TRIGGER_ID_FIELD -> triggerId = xcp.text()
                     TRIGGER_NAME_FIELD -> triggerName = xcp.text()
-                    RELATED_DOCUMENTS_FIELD -> {
-                        ensureExpectedToken(XContentParser.Token.START_ARRAY, xcp.currentToken(), xcp)
-                        while (xcp.nextToken() != XContentParser.Token.END_ARRAY) {
-                            relatedDocuments.add(xcp.text())
-                        }
-                    }
                 }
             }
 

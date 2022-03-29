@@ -20,6 +20,7 @@ import org.opensearch.alerting.action.GetFindingsSearchResponse
 import org.opensearch.alerting.elasticapi.addFilter
 import org.opensearch.alerting.model.Finding
 import org.opensearch.alerting.model.FindingDocument
+import org.opensearch.alerting.model.FindingWithDocs
 import org.opensearch.alerting.settings.AlertingSettings
 import org.opensearch.alerting.util.AlertingException
 import org.opensearch.client.Client
@@ -161,9 +162,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val docs = mutableListOf<FindingDocument>()
                         findings.add(finding)
                         for (doc_id in doc_ids) {
-                            docs.add(searchDocument(doc_id, sourceIndex, actionListener))
+                            val document = searchDocument(doc_id, sourceIndex, actionListener)
+                            if (document)
+                                docs.add(document)
                         }
-                        findingsWithDocs.add(FindingWithDoc(finding, docs))
+                        findingsWithDocs.add(FindingWithDocs(finding, docs))
                         // TODO: remove debug log
                         log.info("findingsWithDoc: $findingsWithDoc")
                     }
@@ -199,13 +202,14 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             )
                             return
                         }
-                        log.info("response: $response")
+                        var findingDocument: FindingDocument? = null
                         if (!response.isSourceEmpty) {
                             val xcp = XContentFactory.xContent(XContentType.JSON)
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                            return FindingDocument.parse(xcp)
+                            findingDocument = FindingDocument.parse(xcp)
                         }
+                        actionListener.onResponse(findingDocument)
                     }
 
                     override fun onFailure(t: Exception) {
