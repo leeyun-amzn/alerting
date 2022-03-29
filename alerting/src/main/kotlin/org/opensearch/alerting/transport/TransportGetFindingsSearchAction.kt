@@ -163,12 +163,12 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         findings.add(finding)
                         for (doc_id in doc_ids) {
                             val document = searchDocument(doc_id, sourceIndex, actionListener)
-                            if (document)
+                            if (document != null)
                                 docs.add(document)
                         }
                         findingsWithDocs.add(FindingWithDocs(finding, docs))
                         // TODO: remove debug log
-                        log.info("findingsWithDoc: $findingsWithDoc")
+                        log.info("findingsWithDocs: $findingsWithDocs")
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                 }
@@ -183,8 +183,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun searchDocument(
         documentId: String,
         sourceIndex: String,
-        actionListener: ActionListener<GetFindingsSearchResponse>
-    ): FindingDocument {
+        actionListener: ActionListener<FindingDocument>
+    ) {
         val getRequest = GetRequest(sourceIndex, documentId)
         client.threadPool().threadContext.stashContext().use {
             client.get(
