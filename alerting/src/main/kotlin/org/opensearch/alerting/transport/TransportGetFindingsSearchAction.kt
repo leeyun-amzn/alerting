@@ -99,7 +99,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun resolve(
         searchSourceBuilder: SearchSourceBuilder,
-        actionListener: ActionListener<SearchResponse>,
+        actionListener: ActionListener<GetFindingsSearchResponse>,
         user: User?
     ) {
         if (user == null) {
@@ -167,7 +167,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun searchDocument(
         documentId: String,
         sourceIndex: String,
-        actionListener: ActionListener<SearchResponse>
+        actionListener: ActionListener<GetFindingsSearchResponse>
     ): FindingDocument? {
         val getRequest = GetRequest(sourceIndex, documentId)
         var findingDocument: FindingDocument? = null
