@@ -145,11 +145,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 override fun onResponse(response: SearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
+                    val findingsWithDocs = mutableListOf<FindingWithDocs>()
                     log.info("response: $response")
                     for (hit in response.hits) {
-                        // Debug use
-                        log.info("Parsing hits.")
-                        log.info("hit: $hit")
                         val id = hit.id
                         val source = hit.sourceAsString
                         log.info("hit.sourceAsString: $source")
@@ -157,18 +155,17 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, hit.sourceAsString)
                         log.info("created parser")
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                        // TODO: Remove debug log
-                        log.info("Parsing new finding with id: $id")
                         val finding = Finding.parse(xcp, id)
-                        // TODO: Search the document with doc_id
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
                         val sourceIndex = finding.index
+                        val docs = mutableListOf<FindingDocument>()
                         findings.add(finding)
                         for (doc_id in doc_ids) {
-                            log.info("doc_id: $doc_id")
-                            // Search document in index
-                            searchDocument(doc_id, sourceIndex, actionListener)
+                            docs.add(searchDocument(doc_id, sourceIndex, actionListener))
                         }
+                        findingsWithDocs.add(FindingWithDoc(finding, docs))
+                        // TODO: remove debug log
+                        log.info("findingsWithDoc: $findingsWithDoc")
                     }
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                 }
@@ -184,11 +181,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
         documentId: String,
         sourceIndex: String,
         actionListener: ActionListener<GetFindingsSearchResponse>
-    ) {
-        log.info("Entering searchDocument.kt.")
+    ): FindingDocument {
         val getRequest = GetRequest(sourceIndex, documentId)
-        // Debug request
-        log.info("Request: $getRequest")
         client.threadPool().threadContext.stashContext().use {
             client.get(
                 getRequest,
@@ -207,15 +201,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         }
                         log.info("response: $response")
                         if (!response.isSourceEmpty) {
-                            log.info("response not empty")
                             val xcp = XContentFactory.xContent(XContentType.JSON)
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
-                            log.info("created document parser")
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                            val parsed = FindingDocument.parse(xcp, documentId)
-                            log.info("Parsed doc: $parsed")
+                            return FindingDocument.parse(xcp)
                         }
-                        // actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
                     }
 
                     override fun onFailure(t: Exception) {
