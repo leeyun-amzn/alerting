@@ -135,15 +135,15 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<SearchResponse>) {
+    fun search(searchSourceBuilder: SearchSourceBuilder, actionListener: ActionListener<GetFindingsSearchResponse>) {
         log.info("Entering RestGetFindingsSearchAction.kt.")
         val searchRequest = SearchRequest()
             .source(searchSourceBuilder)
             .indices(".opensearch-alerting-findings")
         client.search(
             searchRequest,
-            object : ActionListener<SearchResponse> {
-                override fun onResponse(response: SearchResponse) {
+            object : ActionListener<GetFindingsSearchResponse> {
+                override fun onResponse(response: GetFindingsSearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
                     val findings = mutableListOf<Finding>()
                     val findingsWithDocs = mutableListOf<FindingWithDocs>()
@@ -182,8 +182,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun searchDocument(
         documentId: String,
-        sourceIndex: String
-    ): FindingDocument {
+        sourceIndex: String,
+        actionListener: ActionListener<SearchResponse>
+    ): FindingDocument? {
         val getRequest = GetRequest(sourceIndex, documentId)
         var findingDocument: FindingDocument? = null
         client.threadPool().threadContext.stashContext().use {
@@ -209,7 +210,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             findingDocument = FindingDocument.parse(xcp)
                         }
-                        actionListener.onResponse(findingDocument)
+                    }
+
+                    override fun onFailure(t: Exception) {
+                        actionListener.onFailure(AlertingException.wrap(t))
                     }
                 }
             )
