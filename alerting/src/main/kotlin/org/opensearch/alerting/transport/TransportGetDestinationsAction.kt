@@ -144,10 +144,6 @@ class TransportGetDestinationsAction @Inject constructor(
                     val totalDestinationCount = response.hits.totalHits?.value?.toInt()
                     val destinations = mutableListOf<Destination>()
                     for (hit in response.hits) {
-                        // TODO: Remove debug logs
-                        log.info("hit: $hit")
-                        val source = hit.sourceAsString
-                        log.info("hit.sourceAsString: $source")
                         val id = hit.id
                         val version = hit.version
                         val seqNo = hit.seqNo.toInt()
