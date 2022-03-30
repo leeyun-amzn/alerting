@@ -167,10 +167,11 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     response.responses.forEach {
                         // TODO: REMOVE DEBUG LOG
                         log.info("response: $response")
-                        val xcp = XContentFactory.xContent(XContentType.JSON)
+                        /* val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         val findingDocument = FindingDocument.parse(xcp)
+                        */
                         // TODO: Parse the searched documents and add to list of findingWithDocs, need to associate original finding id to response
                     }
                     // TODO: Form the response here with the map/list of findings
