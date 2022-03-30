@@ -191,7 +191,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
-                            log.info("findingDocument: $findingDocument")
+                            log.info("findingDocument: ${findingDocument.toXContent}")
                         }
                     }
 
