@@ -33,8 +33,8 @@ class FindingWithDocs(
 
     override fun toXContent(builder: XContentBuilder, params: ToXContent.Params): XContentBuilder {
         builder.startObject()
-            .field(Finding.FINDING_ID_FIELD, finding)
-            .field(Finding.RELATED_DOC_ID_FIELD, documents)
+            .field(FINDING_FIELD, finding)
+            .field(DOCUMENTS_FIELD, documents)
         builder.endObject()
         return builder
     }
