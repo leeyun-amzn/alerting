@@ -139,9 +139,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
                         val docs = mutableListOf<FindingDocument>()
                         for (doc_id in doc_ids) {
-                            val document = searchDocument(doc_id, finding.index, docs, actionListener)
-                            // TODO: remove debug log
-                            log.info("document: $document")
+                            searchDocument(doc_id, finding.index, docs, actionListener)
                         }
                         val findingWithDoc = FindingWithDocs(finding, docs)
                         findingsWithDocs.add(findingWithDoc)
@@ -165,7 +163,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
         actionListener: ActionListener<GetFindingsSearchResponse>
     ) {
         val getRequest = GetRequest(sourceIndex, documentId)
-        var findingDocument: FindingDocument? = null
         client.threadPool().threadContext.stashContext().use {
             client.get(
                 getRequest,
@@ -187,8 +184,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             val xcp = XContentFactory.xContent(XContentType.JSON)
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                            findingDocument = FindingDocument.parse(xcp)
-                            addDocument(findingDocument, docs)
+                            val findingDocument = FindingDocument.parse(xcp)
+                            docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
                             log.info("findingDocument: $findingDocument")
@@ -201,9 +198,5 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 }
             )
         }
-    }
-
-    private fun addDocument(findingDocument: FindingDocument, docs: List<FindingDocument>) {
-        docs.add(findingDocument)
     }
 }
