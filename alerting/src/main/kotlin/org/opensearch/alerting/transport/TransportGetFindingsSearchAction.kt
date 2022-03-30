@@ -7,6 +7,8 @@ package org.opensearch.alerting.transport
 
 import org.apache.logging.log4j.LogManager
 import org.opensearch.action.ActionListener
+import org.opensearch.action.get.MultiGetRequest
+import org.opensearch.action.get.MultiGetResponse
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.action.search.SearchResponse
 import org.opensearch.action.support.ActionFilters
@@ -136,10 +138,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val finding = Finding.parse(xcp, id)
                         val documentIds = finding.relatedDocId.split(",").toTypedArray()
                         // Add getRequests to mget request
-                        documentIds.values.forEach {
+                        documentIds.forEach {
                             // TODO: check if we want to add individual get document request, or use documentIds array for a single finding related_docs
                             docId ->
-                            mgetMetadataReq.add(MultiGetRequest.Item(sourceIndex, docId))
+                            mgetRequest.add(MultiGetRequest.Item(finding.index, docId))
                         }
                     }
                     searchDocument(mgetRequest, totalFindingCount, actionListener)
@@ -154,7 +156,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
 
     fun searchDocument(
         mgetRequest: MultiGetRequest,
-        totalFindingCount: Int,
+        totalFindingCount: Int?,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ): FindingDocument? {
         client.multiGet(
