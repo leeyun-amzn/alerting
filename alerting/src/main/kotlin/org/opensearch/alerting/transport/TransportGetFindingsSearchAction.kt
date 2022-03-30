@@ -142,11 +142,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val docs = mutableListOf<FindingDocument>()
                         findings.add(finding)
                         for (doc_id in doc_ids) {
-                            val document = searchDocument(doc_id, sourceIndex, actionListener)
+                            val document = searchDocument(doc_id, sourceIndex, docs, actionListener)
                             // TODO: remove debug log
                             log.info("document: $document")
-                            if (document != null)
-                                docs.add(document)
                         }
                         val findingWithDoc = FindingWithDocs(finding, docs)
                         findingsWithDocs.add(findingWithDoc)
@@ -166,6 +164,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun searchDocument(
         documentId: String,
         sourceIndex: String,
+        docs: List<FindingDocument>,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ): FindingDocument? {
         val getRequest = GetRequest(sourceIndex, documentId)
@@ -192,6 +191,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             findingDocument = FindingDocument.parse(xcp)
+                            docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
                             log.info("findingDocument: $findingDocument")
