@@ -158,19 +158,19 @@ class TransportGetFindingsSearchAction @Inject constructor(
         mgetRequest: MultiGetRequest,
         totalFindingCount: Int?,
         actionListener: ActionListener<GetFindingsSearchResponse>
-    ): FindingDocument? {
+    ) {
         client.multiGet(
             mgetRequest,
             object : ActionListener<MultiGetResponse> {
                 override fun onResponse(response: MultiGetResponse) {
-                    // val findingsWithDocs: Map<Finding, FindingDocument> =
-                    response.responses.associate {
+                    val findingsWithDocs: Map<Finding, FindingDocument> = mutableMapOf()
+                    response.responses.forEach {
                         // TODO: REMOVE DEBUG LOG
                         log.info("response: $response")
                         val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                        findingDocument = FindingDocument.parse(xcp)
+                        val findingDocument = FindingDocument.parse(xcp)
                         // TODO: Parse the searched documents and add to map of findings, need to associate original finding id to response
                     }
                     // TODO: Form the response here with the map/list of findings
