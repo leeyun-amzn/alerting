@@ -6,7 +6,7 @@
 package org.opensearch.alerting.action
 
 import org.opensearch.action.ActionResponse
-import org.opensearch.alerting.model.Finding
+import org.opensearch.alerting.model.FindingWithDocs
 import org.opensearch.common.io.stream.StreamInput
 import org.opensearch.common.io.stream.StreamOutput
 import org.opensearch.common.xcontent.ToXContent
@@ -18,12 +18,12 @@ import java.io.IOException
 class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     var status: RestStatus
     var totalFindings: Int?
-    var findings: List<Finding>
+    var findings: List<FindingWithDocs>
 
     constructor(
         status: RestStatus,
         totalFindings: Int?,
-        findings: List<Finding>
+        findings: List<FindingWithDocs>
     ) : super() {
         this.status = status
         this.totalFindings = totalFindings
@@ -33,11 +33,11 @@ class GetFindingsSearchResponse : ActionResponse, ToXContentObject {
     @Throws(IOException::class)
     constructor(sin: StreamInput) {
         this.status = sin.readEnum(RestStatus::class.java)
-        val findings = mutableListOf<Finding>()
+        val findings = mutableListOf<FindingWithDocs>()
         this.totalFindings = sin.readOptionalInt()
         var currentSize = sin.readInt()
         for (i in 0 until currentSize) {
-            findings.add(Finding.readFrom(sin))
+            findings.add(FindingWithDocs.readFrom(sin))
         }
         this.findings = findings
     }

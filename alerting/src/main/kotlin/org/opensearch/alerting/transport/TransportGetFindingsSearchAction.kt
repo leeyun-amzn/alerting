@@ -152,7 +152,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         // TODO: remove debug log
                         log.info("findingWithDoc: $findingWithDoc")
                     }
-                    actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findings))
+                    actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findingsWithDocs))
                 }
 
                 override fun onFailure(t: Exception) {
