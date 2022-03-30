@@ -203,7 +203,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         }
     }
 
-    private fun addDocument(findingDocument: FindingDocument, docs: MutableList<FindingDocument>) {
+    private fun addDocument(findingDocument: FindingDocument, docs: List<FindingDocument>) {
         docs.add(findingDocument)
     }
 }
