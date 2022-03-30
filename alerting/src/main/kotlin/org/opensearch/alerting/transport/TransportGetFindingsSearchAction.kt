@@ -30,6 +30,7 @@ import org.opensearch.common.inject.Inject
 import org.opensearch.common.settings.Settings
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
 import org.opensearch.common.xcontent.XContentParserUtils
@@ -189,7 +190,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
-                            val docStr = findingDocument.toXContent(
+                            val docStr = findingDocument?.toXContent(
                                 XContentBuilder.builder(XContentType.JSON.xContent()),
                                 ToXContent.EMPTY_PARAMS
                             ).string()
