@@ -188,10 +188,10 @@ class TransportGetFindingsSearchAction @Inject constructor(
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             findingDocument = FindingDocument.parse(xcp)
-                            docs.add(findingDocument)
+                            addDocument(findingDocument, docs)
                             // TODO: remove debug log
                             log.info("Response not empty")
-                            log.info("findingDocument: ${findingDocument.toXContent}")
+                            log.info("findingDocument: ${findingDocument}")
                         }
                     }
 
@@ -201,5 +201,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 }
             )
         }
+    }
+
+    private fun addDocument(findingDocument: FindingDocument, docs: MutableList<FindingDocument>) {
+        docs.add(findingDocument)
     }
 }
