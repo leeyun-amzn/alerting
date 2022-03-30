@@ -141,7 +141,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
                         val docs = mutableListOf<FindingDocument>()
                         for (doc_id in doc_ids) {
-                            val findingDocument = searchDocument(doc_id, finding.index, docs, actionListener)
+                            // TODO: Add the document to docs after searching
+                            val findingDocument = searchDocument(doc_id, finding.index, actionListener)
                         }
                         val findingWithDoc = FindingWithDocs(finding, docs)
                         findingsWithDocs.add(findingWithDoc)
