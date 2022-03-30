@@ -133,7 +133,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     val findingsWithDocs = mutableListOf<FindingWithDocs>()
                     for (hit in response.hits) {
                         val id = hit.id
-                        val source = hit.sourceAsString
                         val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, hit.sourceAsString)
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)

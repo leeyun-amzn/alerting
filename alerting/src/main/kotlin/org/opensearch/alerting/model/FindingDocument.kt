@@ -64,8 +64,6 @@ class FindingDocument(
             while (xcp.nextToken() != XContentParser.Token.END_OBJECT) {
                 val fieldName = xcp.currentName()
                 xcp.nextToken()
-                // TODO: Remove debug log
-                log.info("fieldName: $fieldName")
 
                 when (fieldName) {
                     FOUND_FIELD -> found = xcp.booleanValue()
