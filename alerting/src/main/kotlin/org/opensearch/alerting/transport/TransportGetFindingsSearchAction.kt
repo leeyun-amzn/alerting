@@ -139,7 +139,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
                         val docs = mutableListOf<FindingDocument>()
                         for (doc_id in doc_ids) {
-                            searchDocument(doc_id, finding.index, docs, actionListener)
+                            val findingDocument = searchDocument(doc_id, finding.index, docs, actionListener)
                         }
                         val findingWithDoc = FindingWithDocs(finding, docs)
                         findingsWithDocs.add(findingWithDoc)
@@ -161,8 +161,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
         sourceIndex: String,
         docs: List<FindingDocument>,
         actionListener: ActionListener<GetFindingsSearchResponse>
-    ) {
+    ): FindingDocument? {
         val getRequest = GetRequest(sourceIndex, documentId)
+        var findingDocument: FindingDocument? = null
         client.threadPool().threadContext.stashContext().use {
             client.get(
                 getRequest,
@@ -184,11 +185,15 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             val xcp = XContentFactory.xContent(XContentType.JSON)
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
-                            val findingDocument = FindingDocument.parse(xcp)
+                            findingDocument = FindingDocument.parse(xcp)
                             docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
-                            log.info("findingDocument: $findingDocument")
+                            val docStr = findingDocument.toXContent(
+                                XContentBuilder.builder(XContentType.JSON.xContent()),
+                                ToXContent.EMPTY_PARAMS
+                            ).string()
+                            log.info("findingDocument: $docStr")
                         }
                     }
 
@@ -198,5 +203,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                 }
             )
         }
+        return findingDocument
     }
 }
