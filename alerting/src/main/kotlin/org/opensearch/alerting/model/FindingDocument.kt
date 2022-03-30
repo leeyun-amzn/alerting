@@ -58,7 +58,7 @@ class FindingDocument(
         @Throws(IOException::class)
         fun parse(xcp: XContentParser, id: String = NO_ID, index: String = NO_INDEX): FindingDocument {
             var found = false
-            var document: MutableMap<String, Any> = mapOf()
+            var document: MutableMap<String, Any> = mutableMapOf()
 
             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.currentToken(), xcp)
             while (xcp.nextToken() != XContentParser.Token.END_OBJECT) {
