@@ -143,6 +143,8 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         findings.add(finding)
                         for (doc_id in doc_ids) {
                             val document = searchDocument(doc_id, sourceIndex, actionListener)
+                            // TODO: remove debug log
+                            log.info("document: $document")
                             if (document != null)
                                 docs.add(document)
                         }
