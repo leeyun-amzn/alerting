@@ -30,6 +30,7 @@ import org.opensearch.common.inject.Inject
 import org.opensearch.common.settings.Settings
 import org.opensearch.common.xcontent.LoggingDeprecationHandler
 import org.opensearch.common.xcontent.NamedXContentRegistry
+import org.opensearch.common.xcontent.ToXContent
 import org.opensearch.common.xcontent.XContentBuilder
 import org.opensearch.common.xcontent.XContentFactory
 import org.opensearch.common.xcontent.XContentParser
@@ -160,7 +161,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
     fun searchDocument(
         documentId: String,
         sourceIndex: String,
-        docs: List<FindingDocument>,
         actionListener: ActionListener<GetFindingsSearchResponse>
     ): FindingDocument? {
         val getRequest = GetRequest(sourceIndex, documentId)
@@ -187,7 +187,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             findingDocument = FindingDocument.parse(xcp)
-                            docs.add(findingDocument)
                             // TODO: remove debug log
                             log.info("Response not empty")
                             val docStr = findingDocument?.toXContent(
