@@ -44,7 +44,6 @@ class FindingWithDocs(
         const val DOCUMENTS_FIELD = "documents"
 
         @JvmStatic
-        @JvmOverloads
         @Throws(IOException::class)
         fun parse(xcp: XContentParser): FindingWithDocs {
             lateinit var finding: Finding
@@ -70,6 +69,12 @@ class FindingWithDocs(
                 finding = finding,
                 documents = documents
             )
+        }
+
+        @JvmStatic
+        @Throws(IOException::class)
+        fun readFrom(sin: StreamInput): FindingWithDocs {
+            return FindingWithDocs(sin)
         }
     }
 }
