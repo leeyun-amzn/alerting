@@ -192,6 +192,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                                 .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                             XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                             findingDocument = FindingDocument.parse(xcp)
+                            // TODO: remove debug log
+                            log.info("Response not empty")
+                            log.info("findingDocument: $findingDocument")
                         }
                     }
 
