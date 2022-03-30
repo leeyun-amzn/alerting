@@ -184,7 +184,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                                     )
                                 )
                             )
-                            return
+                            return findingDocument
                         }
 
                         if (!response.isSourceEmpty) {
@@ -194,16 +194,17 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             findingDocument = FindingDocument.parse(xcp)
                             // TODO: remove debug log
                             log.info("Response not empty")
-                            log.info("findingDocument: $findingDocument")
+                            log.info("findingDocument: ${findingDocument.to}")
+                            return findingDocument
                         }
                     }
 
                     override fun onFailure(t: Exception) {
                         actionListener.onFailure(AlertingException.wrap(t))
+                        return findingDocument
                     }
                 }
             )
-            return findingDocument
         }
     }
 }
