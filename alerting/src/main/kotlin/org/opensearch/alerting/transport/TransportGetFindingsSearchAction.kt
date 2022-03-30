@@ -166,7 +166,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     val findingsWithDocs: List<FindingWithDocs> = mutableListOf()
                     response.responses.forEach {
                         // TODO: REMOVE DEBUG LOG
-                        log.info("response: $response")
+                        log.info("response: ${response.toString()}")
                         /* val xcp = XContentFactory.xContent(XContentType.JSON)
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
