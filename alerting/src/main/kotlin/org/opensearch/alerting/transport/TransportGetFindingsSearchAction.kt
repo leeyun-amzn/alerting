@@ -163,7 +163,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
             mgetRequest,
             object : ActionListener<MultiGetResponse> {
                 override fun onResponse(response: MultiGetResponse) {
-                    val findingsWithDocs: Map<Finding, FindingDocument> = mutableMapOf()
+                    val findingsWithDocs: List<FindingWithDocs> = mutableListOf()
                     response.responses.forEach {
                         // TODO: REMOVE DEBUG LOG
                         log.info("response: $response")
@@ -171,7 +171,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
                             .createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, response.toString())
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         val findingDocument = FindingDocument.parse(xcp)
-                        // TODO: Parse the searched documents and add to map of findings, need to associate original finding id to response
+                        // TODO: Parse the searched documents and add to list of findingWithDocs, need to associate original finding id to response
                     }
                     // TODO: Form the response here with the map/list of findings
                     actionListener.onResponse(GetFindingsSearchResponse(RestStatus.OK, totalFindingCount, findingsWithDocs))
