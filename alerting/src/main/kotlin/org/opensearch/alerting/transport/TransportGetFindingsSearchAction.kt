@@ -129,7 +129,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
             object : ActionListener<SearchResponse> {
                 override fun onResponse(response: SearchResponse) {
                     val totalFindingCount = response.hits.totalHits?.value?.toInt()
-                    val findings = mutableListOf<Finding>()
                     val findingsWithDocs = mutableListOf<FindingWithDocs>()
                     for (hit in response.hits) {
                         val id = hit.id
@@ -138,11 +137,9 @@ class TransportGetFindingsSearchAction @Inject constructor(
                         XContentParserUtils.ensureExpectedToken(XContentParser.Token.START_OBJECT, xcp.nextToken(), xcp)
                         val finding = Finding.parse(xcp, id)
                         val doc_ids = finding.relatedDocId.split(",").toTypedArray()
-                        val sourceIndex = finding.index
                         val docs = mutableListOf<FindingDocument>()
-                        findings.add(finding)
                         for (doc_id in doc_ids) {
-                            val document = searchDocument(doc_id, sourceIndex, docs, actionListener)
+                            val document = searchDocument(doc_id, finding.index, docs, actionListener)
                             // TODO: remove debug log
                             log.info("document: $document")
                         }
@@ -166,7 +163,7 @@ class TransportGetFindingsSearchAction @Inject constructor(
         sourceIndex: String,
         docs: List<FindingDocument>,
         actionListener: ActionListener<GetFindingsSearchResponse>
-    ): FindingDocument? {
+    ) {
         val getRequest = GetRequest(sourceIndex, documentId)
         var findingDocument: FindingDocument? = null
         client.threadPool().threadContext.stashContext().use {
@@ -203,7 +200,6 @@ class TransportGetFindingsSearchAction @Inject constructor(
                     }
                 }
             )
-            return findingDocument
         }
     }
 }
